@@ -1,0 +1,100 @@
+{
+  "name": "Leads Workflow (Template)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-480, -32],
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "body.nome",
+              "value": "={{ $json.body.nome }}",
+              "type": "string"
+            },
+            {
+              "name": "body.email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "name": "body.empresa",
+              "value": "={{ $json.body.empresa }}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-272, -32],
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "COLE_O_ID_DA_SUA_PLANILHA_AQUI",
+        "sheetName": "Sheet1",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nome": "={{ $json.body.nome }}",
+            "Email": "={{ $json.body.email }}",
+            "Empresa": "={{ $json.body.empresa }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [-64, -32],
+      "name": "Append row in sheet"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.body.email }}",
+        "subject": "=Obrigado pelo seu contato, {{ $json.body.nome }} 🚀",
+        "message": "=<h2>Olá {{ $json.body.nome }} 👋</h2>\n<p>Recebemos seu contato com sucesso!</p>\n<p>Nosso time vai falar com você em breve.</p>\n<br>\n<p><b>Abraços 🚀</b></p>"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [144, -32],
+      "name": "Send a message"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "COLE_SEU_WEBHOOK_DISCORD_AQUI",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"🔥 Novo Lead!\\n\\n👤 Nome: {{ $('Edit Fields').item.json.body.nome }}\\n📧 Email: {{ $('Edit Fields').item.json.body.email }}\\n🏢 Empresa: {{ $('Edit Fields').item.json.body.empresa }}\"\n}"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [352, -32],
+      "name": "Discord Notification"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Edit Fields", "type": "main" }]]
+    },
+    "Edit Fields": {
+      "main": [[{ "node": "Append row in sheet", "type": "main" }]]
+    },
+    "Append row in sheet": {
+      "main": [[{ "node": "Send a message", "type": "main" }]]
+    },
+    "Send a message": {
+      "main": [[{ "node": "Discord Notification", "type": "main" }]]
+    }
+  }
+}
