@@ -49,3 +49,10 @@ Este fluxo automatiza todo o processo de entrada de leads:
 🔗 [LinkedIn](https://www.linkedin.com/in/igor-ortiz-b87265200/)
 
 Desenvolvendo as habilidades em automação e integrações utilizando ferramentas low-code como n8n, focado em criar soluções práticas para otimizar processos e aumentar produtividade 🚀
+
+
+## 🚀 Stack Principal
+
+**Backend:** .NET • Clean Architecture • CQRS  
+**Frontend:** React • TypeScript • Tailwind  
+**Automação:** n8n • APIs • Integrações
